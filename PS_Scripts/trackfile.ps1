@@ -11,8 +11,18 @@ function Get-ZID ($zid) {
 
 function Get-FileZoneID ($path) {
 if (Test-Path $path) {
-$ZI = Get-Content $path -Stream Zone.Identifier
+$ZI = try {Get-Content $path -Stream Zone.Identifier -ErrorAction stop} catch {$message = $error[0].Exception.Message}
+if ($message -ne $null) {
+$prop = @{
+    FilePath = $path
+    Test = "File Present"
+    ZoneID = $message
+    Zone = Get-ZID $ZI.ZoneID
+    ReferrerURL = $ZI.RefferrerUrl
+    HostURL = $ZI.HostURL
+    }
 
+} else {
 $prop = @{
     FilePath = $path
     Test = "File Present"
@@ -21,6 +31,9 @@ $prop = @{
     ReferrerURL = $ZI.RefferrerUrl
     HostURL = $ZI.HostURL
     }
+
+} 
+
 } else {
 $prop = @{
     FilePath = $path
