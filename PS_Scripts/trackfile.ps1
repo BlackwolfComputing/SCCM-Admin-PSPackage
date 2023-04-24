@@ -15,7 +15,7 @@ $ZI = try {Get-Content $path -Stream Zone.Identifier -ErrorAction stop} catch {$
 if ($err) {
     $prop = @{
     FilePath = $path
-    Test = "File Present"
+    Test = "File Present. Error returned"
     ZoneID = $message
     Zone = $null
     ReferrerURL = $null
