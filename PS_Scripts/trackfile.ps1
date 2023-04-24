@@ -11,25 +11,29 @@ function Get-ZID ($zid) {
 
 function Get-FileZoneID ($path) {
 if (Test-Path $path) {
-$ZI = try {Get-Content $path -Stream Zone.Identifier -ErrorAction stop} catch {$message = $error[0].Exception.Message}
-if ($message -ne $null) {
-$prop = @{
+$ZI = try {Get-Content $path -Stream Zone.Identifier -ErrorAction stop} catch {$message = $error[0].Exception.Message; $err=$true}
+if ($err) {
+    $prop = @{
     FilePath = $path
     Test = "File Present"
     ZoneID = $message
-    Zone = Get-ZID $ZI.ZoneID
-    ReferrerURL = $ZI.RefferrerUrl
-    HostURL = $ZI.HostURL
+    Zone = $null
+    ReferrerURL = $null
+    HostURL = $null
+    FileVersion = (Get-Item $path).VersionInfo.FileVersion
+    ProductVersion = (Get-Item $path).VersionInfo.ProductVersion
     }
 
 } else {
 $prop = @{
     FilePath = $path
     Test = "File Present"
-    ZoneID = $ZI.ZoneID
-    Zone = Get-ZID $ZI.ZoneID
-    ReferrerURL = $ZI.RefferrerUrl
-    HostURL = $ZI.HostURL
+    ZoneID = $zi[1].split('=')[1]
+    Zone = Get-ZID $zi[1].split('=')[1]
+    ReferrerURL = $zi[2].split('=')[1]
+    HostURL = $zi[3].split('=')[1]
+    FileVersion = (Get-Item $path).VersionInfo.FileVersion
+    ProductVersion = (Get-Item $path).VersionInfo.ProductVersion
     }
 
 } 
@@ -42,6 +46,8 @@ $prop = @{
     Zone = "N/A"
     ReferrerURL = "N/A"
     HostURL = "N/A"
+    FileVersion = "N/A"
+    ProductVersion = "N/A"
     }
 
 }
@@ -49,3 +55,9 @@ $prop = @{
 $obj = New-Object -TypeName psobject -Property $prop
 $obj
 }
+
+
+
+
+
+
